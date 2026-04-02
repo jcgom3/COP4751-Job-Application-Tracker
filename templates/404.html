@@ -1,0 +1,8 @@
+{% extends "base.html" %} {% block title %}Not Found | Job Application Tracker{%
+endblock %} {% block content %}
+<section class="card">
+  <h2>Page Not Found</h2>
+  <p>The requested resource could not be found.</p>
+  <a class="button-link" href="{{ url_for('index') }}">Return Home</a>
+</section>
+{% endblock %}
