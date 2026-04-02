@@ -1,0 +1,63 @@
+{% extends "base.html" %} {% block title %}Companies | Job Application Tracker{%
+endblock %} {% block content %}
+<section class="page-header">
+  <div>
+    <h2>Companies</h2>
+    <p>Manage organizations associated with your job search.</p>
+  </div>
+  <a class="button-link" href="{{ url_for('companies_create') }}"
+    >Add Company</a
+  >
+</section>
+
+<section class="card">
+  {% if companies %}
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Company</th>
+        <th>Industry</th>
+        <th>Location</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for company in companies %}
+      <tr>
+        <td>{{ company.company_name }}</td>
+        <td>{{ company.industry or "—" }}</td>
+        <td>
+          {% if company.city or company.state %} {{ company.city or "" }}{% if
+          company.city and company.state %}, {% endif %}{{ company.state or ""
+          }} {% else %} — {% endif %}
+        </td>
+        <td class="actions-cell">
+          <a
+            href="{{ url_for('companies_detail', company_id=company.company_id) }}"
+            >View</a
+          >
+          <a
+            href="{{ url_for('companies_edit', company_id=company.company_id) }}"
+            >Edit</a
+          >
+          <form
+            method="POST"
+            action="{{ url_for('companies_delete', company_id=company.company_id) }}"
+            class="inline-form"
+          >
+            <button type="submit" class="button-danger">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <h2>Companies</h2>
+  <p>No companies found yet.</p>
+  <a class="button-link" href="{{ url_for('companies_create') }}"
+    >Add First Company</a
+  >
+  {% endif %}
+</section>
+{% endblock %}

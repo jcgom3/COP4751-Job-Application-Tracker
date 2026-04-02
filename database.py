@@ -1,5 +1,5 @@
 import os
-from typing import Any
+from typing import Any, Dict, List, Optional
 
 import mysql.connector
 from dotenv import load_dotenv
@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-def get_db_config() -> dict[str, Any]:
+def get_db_config() -> Dict[str, Any]:
     """
     Build database connection configuration from environment variables.
 
@@ -31,7 +31,7 @@ def get_connection():
     return mysql.connector.connect(**get_db_config())
 
 
-def fetch_all_companies() -> list[dict[str, Any]]:
+def fetch_all_companies() -> List[Dict[str, Any]]:
     """
     Return all companies ordered alphabetically.
 
@@ -66,7 +66,7 @@ def fetch_all_companies() -> list[dict[str, Any]]:
             connection.close()
 
 
-def fetch_company_by_id(company_id: int) -> dict[str, Any] | None:
+def fetch_company_by_id(company_id: int) -> Optional[Dict[str, Any]]:
     """
     Return a single company by ID, or None if the company does not exist.
     """
