@@ -60,3 +60,56 @@ CREATE TABLE contacts (
         REFERENCES companies(company_id)
         ON DELETE CASCADE
 );
+
+
+
+INSERT INTO companies (company_name, industry, city, state, notes)
+VALUES
+('TechNova', 'Technology', 'Orlando', 'FL', 'Applied for multiple engineering roles.'),
+('HealthBridge', 'Healthcare', 'Tampa', 'FL', 'Strong alignment with healthcare background.'),
+('CloudAxis', 'Software', 'Austin', 'TX', 'Interesting backend-focused opportunities.');
+
+INSERT INTO jobs (company_id, job_title, salary_min, salary_max, job_type, job_description, required_skills_json, date_posted)
+VALUES
+(
+    1,
+    'Backend Software Engineer',
+    110000.00,
+    145000.00,
+    'Full-time',
+    'Build and maintain backend services and APIs.',
+    JSON_ARRAY('python', 'flask', 'mysql', 'sql', 'git'),
+    '2026-04-01'
+),
+(
+    2,
+    'Full Stack Engineer',
+    100000.00,
+    135000.00,
+    'Full-time',
+    'Work across frontend and backend systems.',
+    JSON_ARRAY('python', 'javascript', 'html', 'css', 'mysql'),
+    '2026-04-01'
+),
+(
+    3,
+    'Data Engineer',
+    115000.00,
+    150000.00,
+    'Full-time',
+    'Design data pipelines and platform integrations.',
+    JSON_ARRAY('python', 'sql', 'etl', 'mysql', 'aws'),
+    '2026-04-01'
+);
+
+INSERT INTO applications (job_id, application_date, status, resume_version, cover_letter_sent, interview_date, notes)
+VALUES
+(1, '2026-04-01', 'Applied', 'v1.0', TRUE, NULL, 'Initial application submitted.'),
+(2, '2026-04-02', 'Interview Scheduled', 'v1.1', TRUE, '2026-04-10', 'Phone screen scheduled.'),
+(3, '2026-04-03', 'Applied', 'v1.2', FALSE, NULL, 'Need to tailor follow-up.');
+
+INSERT INTO contacts (company_id, first_name, last_name, email, phone, job_title, notes)
+VALUES
+(1, 'Jordan', 'Lee', 'jordan.lee@technova.com', '555-111-2222', 'Engineering Manager', 'Primary hiring contact.'),
+(2, 'Maya', 'Patel', 'maya.patel@healthbridge.com', '555-333-4444', 'Recruiter', 'Reached out after application.'),
+(3, 'Andre', 'Kim', 'andre.kim@cloudaxis.com', '555-555-6666', 'Director of Data', 'Potential referral path.');
