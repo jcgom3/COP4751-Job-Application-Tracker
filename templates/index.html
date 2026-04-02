@@ -1,21 +1,22 @@
 {% extends "base.html" %} {% block title %}Home | Job Application Tracker{%
 endblock %} {% block content %}
-<section>
-  <h2>Job Application Tracker</h2>
+<section class="card">
+  <h2>Welcome</h2>
   <p>
-    This application helps users manage companies, jobs, applications, and
-    professional contacts in one centralized workflow.
+    This application helps track companies, jobs, applications, and contacts
+    throughout the job search lifecycle.
   </p>
   <p>
-    Milestone 2 establishes the database schema, environment-based
-    configuration, and end-to-end application-to-database connectivity.
+    Milestone 3 introduces the first complete production-style CRUD workflow:
+    company management.
   </p>
-
-  <ul>
-    <li>Flask app is running</li>
-    <li>MySQL connection is configured</li>
-    <li>Core schema is created</li>
-    <li>Initial sample data is loaded</li>
-  </ul>
+  <div class="page-actions">
+    <a class="button-link" href="{{ url_for('companies_list') }}"
+      >View Companies</a
+    >
+    <a class="button-link button-secondary" href="{{ url_for('health_check') }}"
+      >System Health</a
+    >
+  </div>
 </section>
 {% endblock %}
