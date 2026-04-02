@@ -1,0 +1,3 @@
+-- Job Application Tracker schema
+-- Milestone 1 initializes the file.
+-- Tables will be added incrementally in later commits.
