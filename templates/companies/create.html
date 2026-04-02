@@ -1,0 +1,49 @@
+{% extends "base.html" %} {% block title %}Create Company | Job Application
+Tracker{% endblock %} {% block content %}
+<section class="page-header">
+  <div>
+    <h2>Create Company</h2>
+    <p>Add a new company to the tracker.</p>
+  </div>
+  <a class="button-link button-secondary" href="{{ url_for('companies_list') }}"
+    >Back to Companies</a
+  >
+</section>
+
+<section class="card">
+  {% if error_message %}
+  <div class="alert-error">{{ error_message }}</div>
+  {% endif %}
+
+  <form method="POST" class="form-grid">
+    <label>
+      Company Name
+      <input type="text" name="company_name" required />
+    </label>
+
+    <label>
+      Industry
+      <input type="text" name="industry" />
+    </label>
+
+    <label>
+      City
+      <input type="text" name="city" />
+    </label>
+
+    <label>
+      State
+      <input type="text" name="state" />
+    </label>
+
+    <label class="full-width">
+      Notes
+      <textarea name="notes" rows="5"></textarea>
+    </label>
+
+    <div class="full-width form-actions">
+      <button type="submit">Create Company</button>
+    </div>
+  </form>
+</section>
+{% endblock %}

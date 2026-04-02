@@ -1,0 +1,44 @@
+{% extends "base.html" %} {% block title %}{{ company.company_name }} | Job
+Application Tracker{% endblock %} {% block content %}
+<section class="page-header">
+  <div>
+    <h2>{{ company.company_name }}</h2>
+    <p>Company detail view</p>
+  </div>
+  <div class="page-actions">
+    <a
+      class="button-link"
+      href="{{ url_for('companies_edit', company_id=company.company_id) }}"
+      >Edit</a
+    >
+    <a
+      class="button-link button-secondary"
+      href="{{ url_for('companies_list') }}"
+      >Back to Companies</a
+    >
+  </div>
+</section>
+
+<section class="card detail-grid">
+  <div>
+    <h3>Industry</h3>
+    <p>{{ company.industry or "—" }}</p>
+  </div>
+  <div>
+    <h3>City</h3>
+    <p>{{ company.city or "—" }}</p>
+  </div>
+  <div>
+    <h3>State</h3>
+    <p>{{ company.state or "—" }}</p>
+  </div>
+  <div>
+    <h3>Created</h3>
+    <p>{{ company.created_at }}</p>
+  </div>
+  <div class="detail-notes">
+    <h3>Notes</h3>
+    <p>{{ company.notes or "No notes available." }}</p>
+  </div>
+</section>
+{% endblock %}
