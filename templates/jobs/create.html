@@ -1,0 +1,75 @@
+{% extends "base.html" %} {% block title %}Create Job | Job Application
+Tracker{% endblock %} {% block content %}
+<section class="page-header">
+  <div>
+    <h2>Create Job</h2>
+    <p>Add a new role to the tracker.</p>
+  </div>
+  <a class="button-link button-secondary" href="{{ url_for('jobs_list') }}"
+    >Back to Jobs</a
+  >
+</section>
+
+<section class="card">
+  {% if error_message %}
+  <div class="alert-error">{{ error_message }}</div>
+  {% endif %}
+
+  <form method="POST" class="form-grid">
+    <label>
+      Company
+      <select name="company_id" required>
+        <option value="">Select a company</option>
+        {% for company in company_options %}
+        <option value="{{ company.company_id }}">
+          {{ company.company_name }}
+        </option>
+        {% endfor %}
+      </select>
+    </label>
+
+    <label>
+      Job Title
+      <input type="text" name="job_title" required />
+    </label>
+
+    <label>
+      Salary Minimum
+      <input type="number" step="0.01" name="salary_min" />
+    </label>
+
+    <label>
+      Salary Maximum
+      <input type="number" step="0.01" name="salary_max" />
+    </label>
+
+    <label>
+      Job Type
+      <input type="text" name="job_type" />
+    </label>
+
+    <label>
+      Date Posted
+      <input type="date" name="date_posted" />
+    </label>
+
+    <label class="full-width">
+      Job Description
+      <textarea name="job_description" rows="5"></textarea>
+    </label>
+
+    <label class="full-width">
+      Skills
+      <input
+        type="text"
+        name="skills_text"
+        placeholder="python, flask, mysql, sql, git"
+      />
+    </label>
+
+    <div class="full-width form-actions">
+      <button type="submit">Create Job</button>
+    </div>
+  </form>
+</section>
+{% endblock %}

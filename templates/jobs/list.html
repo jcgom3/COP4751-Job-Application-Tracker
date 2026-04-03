@@ -1,0 +1,53 @@
+{% extends "base.html" %} {% block title %}Jobs | Job Application Tracker{%
+endblock %} {% block content %}
+<section class="page-header">
+  <div>
+    <h2>Jobs</h2>
+    <p>Track open roles and their required skills.</p>
+  </div>
+  <a class="button-link" href="{{ url_for('jobs_create') }}">Add Job</a>
+</section>
+
+<section class="card">
+  {% if jobs %}
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Job Title</th>
+        <th>Company</th>
+        <th>Type</th>
+        <th>Salary Range</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for job in jobs %}
+      <tr>
+        <td>{{ job.job_title }}</td>
+        <td>{{ job.company_name }}</td>
+        <td>{{ job.job_type or "—" }}</td>
+        <td>
+          {% if job.salary_min or job.salary_max %} {{ job.salary_min or "—" }}
+          - {{ job.salary_max or "—" }} {% else %} — {% endif %}
+        </td>
+        <td class="actions-cell">
+          <a href="{{ url_for('jobs_detail', job_id=job.job_id) }}">View</a>
+          <a href="{{ url_for('jobs_edit', job_id=job.job_id) }}">Edit</a>
+          <form
+            method="POST"
+            action="{{ url_for('jobs_delete', job_id=job.job_id) }}"
+            class="inline-form"
+          >
+            <button type="submit" class="button-danger">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>No jobs found yet.</p>
+  <a class="button-link" href="{{ url_for('jobs_create') }}">Add First Job</a>
+  {% endif %}
+</section>
+{% endblock %}

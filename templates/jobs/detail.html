@@ -1,0 +1,52 @@
+{% extends "base.html" %} {% block title %}{{ job.job_title }} | Job Application
+Tracker{% endblock %} {% block content %}
+<section class="page-header">
+  <div>
+    <h2>{{ job.job_title }}</h2>
+    <p>{{ job.company_name }}</p>
+  </div>
+  <div class="page-actions">
+    <a class="button-link" href="{{ url_for('jobs_edit', job_id=job.job_id) }}"
+      >Edit</a
+    >
+    <a class="button-link button-secondary" href="{{ url_for('jobs_list') }}"
+      >Back to Jobs</a
+    >
+  </div>
+</section>
+
+<section class="card detail-grid">
+  <div>
+    <h3>Company</h3>
+    <p>{{ job.company_name }}</p>
+  </div>
+  <div>
+    <h3>Job Type</h3>
+    <p>{{ job.job_type or "—" }}</p>
+  </div>
+  <div>
+    <h3>Salary Minimum</h3>
+    <p>{{ job.salary_min or "—" }}</p>
+  </div>
+  <div>
+    <h3>Salary Maximum</h3>
+    <p>{{ job.salary_max or "—" }}</p>
+  </div>
+  <div>
+    <h3>Date Posted</h3>
+    <p>{{ job.date_posted or "—" }}</p>
+  </div>
+  <div>
+    <h3>Created</h3>
+    <p>{{ job.created_at }}</p>
+  </div>
+  <div class="detail-notes">
+    <h3>Description</h3>
+    <p>{{ job.job_description or "No description available." }}</p>
+  </div>
+  <div class="detail-notes">
+    <h3>Required Skills JSON</h3>
+    <p>{{ job.required_skills_json or "[]" }}</p>
+  </div>
+</section>
+{% endblock %}
