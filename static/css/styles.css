@@ -214,3 +214,11 @@ button:hover {
     grid-template-columns: 1fr;
   }
 }
+
+.form-grid select {
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 0.75rem;
+  font: inherit;
+  background: #ffffff;
+}
