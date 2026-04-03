@@ -1,6 +1,7 @@
 import os
 from typing import Any, Dict, List, Optional
 
+
 import mysql.connector
 from dotenv import load_dotenv
 
@@ -490,3 +491,252 @@ def format_skills_for_form(required_skills_json: Any) -> str:
         pass
 
     return str(required_skills_json)
+
+
+def fetch_all_applications() -> List[Dict[str, Any]]:
+    """
+    Return all applications with related job and company context.
+
+    Joining through jobs and companies makes the application list much more
+    useful in the UI and avoids additional lookup logic in templates.
+    """
+    connection = None
+    cursor = None
+
+    try:
+        connection = get_connection()
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute(
+            """
+            SELECT
+                a.application_id,
+                a.job_id,
+                a.application_date,
+                a.status,
+                a.resume_version,
+                a.cover_letter_sent,
+                a.interview_date,
+                a.notes,
+                a.created_at,
+                j.job_title,
+                c.company_name
+            FROM applications a
+            INNER JOIN jobs j
+                ON a.job_id = j.job_id
+            INNER JOIN companies c
+                ON j.company_id = c.company_id
+            ORDER BY a.created_at DESC, a.application_date DESC
+            """
+        )
+        return cursor.fetchall()
+    finally:
+        if cursor is not None:
+            cursor.close()
+        if connection is not None and connection.is_connected():
+            connection.close()
+
+
+def fetch_application_by_id(application_id: int) -> Optional[Dict[str, Any]]:
+    """
+    Return a single application with related job and company context.
+    """
+    connection = None
+    cursor = None
+
+    try:
+        connection = get_connection()
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute(
+            """
+            SELECT
+                a.application_id,
+                a.job_id,
+                a.application_date,
+                a.status,
+                a.resume_version,
+                a.cover_letter_sent,
+                a.interview_date,
+                a.notes,
+                a.created_at,
+                j.job_title,
+                c.company_name
+            FROM applications a
+            INNER JOIN jobs j
+                ON a.job_id = j.job_id
+            INNER JOIN companies c
+                ON j.company_id = c.company_id
+            WHERE a.application_id = %s
+            """,
+            (application_id,),
+        )
+        return cursor.fetchone()
+    finally:
+        if cursor is not None:
+            cursor.close()
+        if connection is not None and connection.is_connected():
+            connection.close()
+
+
+def fetch_job_options() -> List[Dict[str, Any]]:
+    """
+    Return lightweight job options for dropdown selection in forms.
+    """
+    connection = None
+    cursor = None
+
+    try:
+        connection = get_connection()
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute(
+            """
+            SELECT
+                j.job_id,
+                j.job_title,
+                c.company_name
+            FROM jobs j
+            INNER JOIN companies c
+                ON j.company_id = c.company_id
+            ORDER BY c.company_name ASC, j.job_title ASC
+            """
+        )
+        return cursor.fetchall()
+    finally:
+        if cursor is not None:
+            cursor.close()
+        if connection is not None and connection.is_connected():
+            connection.close()
+
+
+def create_application(
+    job_id: int,
+    application_date: Optional[str],
+    status: str,
+    resume_version: str,
+    cover_letter_sent: bool,
+    interview_date: Optional[str],
+    notes: str,
+) -> int:
+    """
+    Insert a new application and return its ID.
+    """
+    connection = None
+    cursor = None
+
+    try:
+        connection = get_connection()
+        cursor = connection.cursor()
+        cursor.execute(
+            """
+            INSERT INTO applications (
+                job_id,
+                application_date,
+                status,
+                resume_version,
+                cover_letter_sent,
+                interview_date,
+                notes
+            )
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """,
+            (
+                job_id,
+                application_date,
+                status,
+                resume_version,
+                cover_letter_sent,
+                interview_date,
+                notes,
+            ),
+        )
+        connection.commit()
+        return cursor.lastrowid
+    except Exception:
+        if connection is not None:
+            connection.rollback()
+        raise
+    finally:
+        if cursor is not None:
+            cursor.close()
+        if connection is not None and connection.is_connected():
+            connection.close()
+
+
+def update_application(
+    application_id: int,
+    job_id: int,
+    application_date: Optional[str],
+    status: str,
+    resume_version: str,
+    cover_letter_sent: bool,
+    interview_date: Optional[str],
+    notes: str,
+) -> None:
+    """
+    Update an existing application.
+    """
+    connection = None
+    cursor = None
+
+    try:
+        connection = get_connection()
+        cursor = connection.cursor()
+        cursor.execute(
+            """
+            UPDATE applications
+            SET
+                job_id = %s,
+                application_date = %s,
+                status = %s,
+                resume_version = %s,
+                cover_letter_sent = %s,
+                interview_date = %s,
+                notes = %s
+            WHERE application_id = %s
+            """,
+            (
+                job_id,
+                application_date,
+                status,
+                resume_version,
+                cover_letter_sent,
+                interview_date,
+                notes,
+                application_id,
+            ),
+        )
+        connection.commit()
+    except Exception:
+        if connection is not None:
+            connection.rollback()
+        raise
+    finally:
+        if cursor is not None:
+            cursor.close()
+        if connection is not None and connection.is_connected():
+            connection.close()
+
+
+def delete_application(application_id: int) -> None:
+    """
+    Delete an application by ID.
+    """
+    connection = None
+    cursor = None
+
+    try:
+        connection = get_connection()
+        cursor = connection.cursor()
+        cursor.execute(
+            "DELETE FROM applications WHERE application_id = %s",
+            (application_id,),
+        )
+        connection.commit()
+    except Exception:
+        if connection is not None:
+            connection.rollback()
+        raise
+    finally:
+        if cursor is not None:
+            cursor.close()
+        if connection is not None and connection.is_connected():
+            connection.close()
