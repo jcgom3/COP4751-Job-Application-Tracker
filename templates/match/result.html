@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Job Match | Job Application Tracker{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div>
+        <h2>Job Match</h2>
+        <p>Compare your skills against a job's required skills and calculate a match percentage.</p>
+    </div>
+</section>
+
+<section class="card">
+    {% if error_message %}
+        <div class="alert-error">{{ error_message }}</div>
+    {% endif %}
+
+    <form method="POST" class="form-grid">
+        <label>
+            Job
+            <select name="job_id" required>
+                <option value="">Select a job</option>
+                {% for job in job_options %}
+                    <option value="{{ job.job_id }}" {% if selected_job_id == job.job_id %}selected{% endif %}>
+                        {{ job.company_name }} — {{ job.job_title }}
+                    </option>
+                {% endfor %}
+            </select>
+        </label>
+
+        <label class="full-width">
+            Your Skills
+            <input
+                type="text"
+                name="user_skills"
+                value="{{ user_skills_text }}"
+                placeholder="python, flask, mysql, sql, git"
+                required
+            >
+        </label>
+
+        <div class="full-width form-actions">
+            <button type="submit">Calculate Match</button>
+        </div>
+    </form>
+</section>
+
+{% if match_result %}
+<section class="page-header" style="margin-top: 1.5rem;">
+    <div>
+        <h2>Match Result</h2>
+        <p>{{ match_result.job.company_name }} — {{ match_result.job.job_title }}</p>
+    </div>
+</section>
+
+<section class="card detail-grid">
+    <div>
+        <h3>Match Percentage</h3>
+        <p class="match-score">{{ match_result.match_percentage }}%</p>
+    </div>
+    <div>
+        <h3>Total Required Skills</h3>
+        <p>{{ match_result.required_skills|length }}</p>
+    </div>
+    <div>
+        <h3>Matched Skills</h3>
+        <p>{{ match_result.matched_skills|length }}</p>
+    </div>
+    <div>
+        <h3>Missing Skills</h3>
+        <p>{{ match_result.missing_skills|length }}</p>
+    </div>
+
+    <div class="detail-notes">
+        <h3>Your Skills</h3>
+        {% if match_result.user_skills %}
+            <p>{{ match_result.user_skills | join(", ") }}</p>
+        {% else %}
+            <p>No skills entered.</p>
+        {% endif %}
+    </div>
+
+    <div class="detail-notes">
+        <h3>Required Skills</h3>
+        {% if match_result.required_skills %}
+            <p>{{ match_result.required_skills | join(", ") }}</p>
+        {% else %}
+            <p>No required skills defined for this job.</p>
+        {% endif %}
+    </div>
+
+    <div class="detail-notes">
+        <h3>Matched Skills</h3>
+        {% if match_result.matched_skills %}
+            <p>{{ match_result.matched_skills | join(", ") }}</p>
+        {% else %}
+            <p>No matched skills.</p>
+        {% endif %}
+    </div>
+
+    <div class="detail-notes">
+        <h3>Missing Skills</h3>
+        {% if match_result.missing_skills %}
+            <p>{{ match_result.missing_skills | join(", ") }}</p>
+        {% else %}
+            <p>No missing skills. Strong fit.</p>
+        {% endif %}
+    </div>
+</section>
+{% endif %}
+{% endblock %}
