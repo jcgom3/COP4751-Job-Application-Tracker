@@ -21,6 +21,13 @@ from database import (
     fetch_contact_by_id,
     update_contact,
     calculate_job_match,
+    fetch_job_options,
+    create_application,
+    delete_application,
+    fetch_all_applications,
+    fetch_application_by_id,
+    fetch_job_options,
+    update_application,
 )
 
 app = Flask(__name__)
@@ -167,8 +174,6 @@ def companies_delete(company_id: int):
     return redirect(url_for("companies_list"))
 
 
-if __name__ == "__main__":
-    app.run(debug=True)
     
     
 @app.route("/jobs")
@@ -456,3 +461,127 @@ def job_match():
         selected_job_id=selected_job_id,
         user_skills_text=user_skills_text,
     )
+
+
+
+
+@app.route("/applications")
+def applications_list():
+    """
+    Show all applications.
+    """
+    applications = fetch_all_applications()
+    return render_template("applications/list.html", applications=applications)
+
+
+@app.route("/applications/<int:application_id>")
+def applications_detail(application_id: int):
+    """
+    Show a single application detail page.
+    """
+    application = fetch_application_by_id(application_id)
+
+    if application is None:
+        return render_template("404.html"), 404
+
+    return render_template("applications/detail.html", application=application)
+
+
+@app.route("/applications/create", methods=["GET", "POST"])
+def applications_create():
+    """
+    Render the create form and handle application creation.
+    """
+    job_options = fetch_job_options()
+    error_message = None
+
+    if request.method == "POST":
+        job_id_raw = request.form.get("job_id", "").strip()
+        application_date = request.form.get("application_date", "").strip() or None
+        status = request.form.get("status", "").strip()
+        resume_version = request.form.get("resume_version", "").strip()
+        cover_letter_sent = request.form.get("cover_letter_sent") == "on"
+        interview_date = request.form.get("interview_date", "").strip() or None
+        notes = request.form.get("notes", "").strip()
+
+        if not job_id_raw or not status:
+            error_message = "Job and status are required."
+        else:
+            new_application_id = create_application(
+                job_id=int(job_id_raw),
+                application_date=application_date,
+                status=status,
+                resume_version=resume_version,
+                cover_letter_sent=cover_letter_sent,
+                interview_date=interview_date,
+                notes=notes,
+            )
+            return redirect(
+                url_for("applications_detail", application_id=new_application_id)
+            )
+
+    return render_template(
+        "applications/create.html",
+        job_options=job_options,
+        error_message=error_message,
+    )
+
+
+@app.route("/applications/<int:application_id>/edit", methods=["GET", "POST"])
+def applications_edit(application_id: int):
+    """
+    Render the edit form and handle updates for an existing application.
+    """
+    application = fetch_application_by_id(application_id)
+    job_options = fetch_job_options()
+    error_message = None
+
+    if application is None:
+        return render_template("404.html"), 404
+
+    if request.method == "POST":
+        job_id_raw = request.form.get("job_id", "").strip()
+        application_date = request.form.get("application_date", "").strip() or None
+        status = request.form.get("status", "").strip()
+        resume_version = request.form.get("resume_version", "").strip()
+        cover_letter_sent = request.form.get("cover_letter_sent") == "on"
+        interview_date = request.form.get("interview_date", "").strip() or None
+        notes = request.form.get("notes", "").strip()
+
+        if not job_id_raw or not status:
+            error_message = "Job and status are required."
+        else:
+            update_application(
+                application_id=application_id,
+                job_id=int(job_id_raw),
+                application_date=application_date,
+                status=status,
+                resume_version=resume_version,
+                cover_letter_sent=cover_letter_sent,
+                interview_date=interview_date,
+                notes=notes,
+            )
+            return redirect(
+                url_for("applications_detail", application_id=application_id)
+            )
+
+    return render_template(
+        "applications/edit.html",
+        application=application,
+        job_options=job_options,
+        error_message=error_message,
+    )
+
+
+@app.route("/applications/<int:application_id>/delete", methods=["POST"])
+def applications_delete(application_id: int):
+    """
+    Delete an application and return to the list page.
+    """
+    delete_application(application_id)
+    return redirect(url_for("applications_list"))
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
+    
