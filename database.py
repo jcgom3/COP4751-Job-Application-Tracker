@@ -953,3 +953,86 @@ def delete_contact(contact_id: int) -> None:
             cursor.close()
         if connection is not None and connection.is_connected():
             connection.close()
+            
+            
+            
+def parse_skills_json(required_skills_json: Any) -> List[str]:
+    """
+    Convert the stored JSON skills field into a normalized Python list.
+
+    The jobs table stores required skills as JSON text so they can support the
+    match feature without additional schema complexity. This helper ensures the
+    rest of the application always works with a clean list of lowercase skills.
+    """
+    if not required_skills_json:
+        return []
+
+    if isinstance(required_skills_json, list):
+        return [str(skill).strip().lower() for skill in required_skills_json if str(skill).strip()]
+
+    try:
+        parsed = json.loads(required_skills_json)
+        if isinstance(parsed, list):
+            return [str(skill).strip().lower() for skill in parsed if str(skill).strip()]
+    except Exception:
+        pass
+
+    return []
+
+
+def parse_user_skills(skills_text: str) -> List[str]:
+    """
+    Normalize a comma-separated user skill string into a deduplicated list.
+
+    This keeps matching case-insensitive and resilient to extra spaces while
+    also making the result easier to explain during the project demo.
+    """
+    seen = set()
+    normalized_skills = []
+
+    for raw_skill in skills_text.split(","):
+        skill = raw_skill.strip().lower()
+        if skill and skill not in seen:
+            seen.add(skill)
+            normalized_skills.append(skill)
+
+    return normalized_skills
+
+
+def calculate_job_match(job_id: int, user_skills_text: str) -> Optional[Dict[str, Any]]:
+    """
+    Calculate the match percentage between a user's skills and a job's
+    required skills.
+
+    Returns a result object that includes:
+    - job context
+    - normalized user skills
+    - required job skills
+    - matched skills
+    - missing skills
+    - match percentage
+    """
+    job = fetch_job_by_id(job_id)
+
+    if job is None:
+        return None
+
+    required_skills = parse_skills_json(job.get("required_skills_json"))
+    user_skills = parse_user_skills(user_skills_text)
+
+    matched_skills = [skill for skill in required_skills if skill in user_skills]
+    missing_skills = [skill for skill in required_skills if skill not in user_skills]
+
+    if required_skills:
+        match_percentage = round((len(matched_skills) / len(required_skills)) * 100, 2)
+    else:
+        match_percentage = 0.0
+
+    return {
+        "job": job,
+        "user_skills": user_skills,
+        "required_skills": required_skills,
+        "matched_skills": matched_skills,
+        "missing_skills": missing_skills,
+        "match_percentage": match_percentage,
+    }
