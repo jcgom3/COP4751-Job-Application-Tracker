@@ -1,0 +1,68 @@
+{% extends "base.html" %} {% block title %}Create Application | Job Application
+Tracker{% endblock %} {% block content %}
+<section class="page-header">
+  <div>
+    <h2>Create Application</h2>
+    <p>Add a new application record to the tracker.</p>
+  </div>
+  <a
+    class="button-link button-secondary"
+    href="{{ url_for('applications_list') }}"
+    >Back to Applications</a
+  >
+</section>
+
+<section class="card">
+  {% if error_message %}
+  <div class="alert-error">{{ error_message }}</div>
+  {% endif %}
+
+  <form method="POST" class="form-grid">
+    <label>
+      Job
+      <select name="job_id" required>
+        <option value="">Select a job</option>
+        {% for job in job_options %}
+        <option value="{{ job.job_id }}">
+          {{ job.company_name }} — {{ job.job_title }}
+        </option>
+        {% endfor %}
+      </select>
+    </label>
+
+    <label>
+      Status
+      <input type="text" name="status" placeholder="Applied" required />
+    </label>
+
+    <label>
+      Application Date
+      <input type="date" name="application_date" />
+    </label>
+
+    <label>
+      Interview Date
+      <input type="date" name="interview_date" />
+    </label>
+
+    <label>
+      Resume Version
+      <input type="text" name="resume_version" placeholder="v1.0" />
+    </label>
+
+    <label class="checkbox-label">
+      <input type="checkbox" name="cover_letter_sent" />
+      Cover Letter Sent
+    </label>
+
+    <label class="full-width">
+      Notes
+      <textarea name="notes" rows="5"></textarea>
+    </label>
+
+    <div class="full-width form-actions">
+      <button type="submit">Create Application</button>
+    </div>
+  </form>
+</section>
+{% endblock %}

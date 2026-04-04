@@ -1,0 +1,62 @@
+{% extends "base.html" %} {% block title %}Applications | Job Application
+Tracker{% endblock %} {% block content %}
+<section class="page-header">
+  <div>
+    <h2>Applications</h2>
+    <p>
+      Track submitted applications and progress through the hiring pipeline.
+    </p>
+  </div>
+  <a class="button-link" href="{{ url_for('applications_create') }}"
+    >Add Application</a
+  >
+</section>
+
+<section class="card">
+  {% if applications %}
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Job</th>
+        <th>Company</th>
+        <th>Status</th>
+        <th>Applied On</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for application in applications %}
+      <tr>
+        <td>{{ application.job_title }}</td>
+        <td>{{ application.company_name }}</td>
+        <td>{{ application.status }}</td>
+        <td>{{ application.application_date or "—" }}</td>
+        <td class="actions-cell">
+          <a
+            href="{{ url_for('applications_detail', application_id=application.application_id) }}"
+            >View</a
+          >
+          <a
+            href="{{ url_for('applications_edit', application_id=application.application_id) }}"
+            >Edit</a
+          >
+          <form
+            method="POST"
+            action="{{ url_for('applications_delete', application_id=application.application_id) }}"
+            class="inline-form"
+          >
+            <button type="submit" class="button-danger">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>No applications found yet.</p>
+  <a class="button-link" href="{{ url_for('applications_create') }}"
+    >Add First Application</a
+  >
+  {% endif %}
+</section>
+{% endblock %}
