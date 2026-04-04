@@ -20,6 +20,7 @@ from database import (
     fetch_all_contacts,
     fetch_contact_by_id,
     update_contact,
+    calculate_job_match,
 )
 
 app = Flask(__name__)
@@ -412,3 +413,46 @@ def contacts_delete(contact_id: int):
     """
     delete_contact(contact_id)
     return redirect(url_for("contacts_list"))
+
+@app.route("/match", methods=["GET", "POST"])
+def job_match():
+    """
+    Render the job match page and calculate skill alignment for a selected job.
+
+    The workflow is intentionally simple for the course project:
+    - user selects one job
+    - user enters their skills as comma-separated text
+    - backend returns percentage, matched skills, and missing skills
+    """
+    job_options = fetch_job_options()
+    error_message = None
+    match_result = None
+    selected_job_id = None
+    user_skills_text = ""
+
+    if request.method == "POST":
+        selected_job_id_raw = request.form.get("job_id", "").strip()
+        user_skills_text = request.form.get("user_skills", "").strip()
+
+        if not selected_job_id_raw:
+            error_message = "Please select a job."
+        elif not user_skills_text:
+            error_message = "Please enter at least one skill."
+        else:
+            selected_job_id = int(selected_job_id_raw)
+            match_result = calculate_job_match(
+                job_id=selected_job_id,
+                user_skills_text=user_skills_text,
+            )
+
+            if match_result is None:
+                error_message = "Selected job could not be found."
+
+    return render_template(
+        "match/result.html",
+        job_options=job_options,
+        error_message=error_message,
+        match_result=match_result,
+        selected_job_id=selected_job_id,
+        user_skills_text=user_skills_text,
+    )
