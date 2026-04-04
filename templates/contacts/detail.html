@@ -1,0 +1,48 @@
+{% extends "base.html" %} {% block title %}Contact Detail | Job Application
+Tracker{% endblock %} {% block content %}
+<section class="page-header">
+  <div>
+    <h2>{{ contact.first_name }} {{ contact.last_name }}</h2>
+    <p>{{ contact.company_name }}</p>
+  </div>
+  <div class="page-actions">
+    <a
+      class="button-link"
+      href="{{ url_for('contacts_edit', contact_id=contact.contact_id) }}"
+      >Edit</a
+    >
+    <a
+      class="button-link button-secondary"
+      href="{{ url_for('contacts_list') }}"
+      >Back to Contacts</a
+    >
+  </div>
+</section>
+
+<section class="card detail-grid">
+  <div>
+    <h3>Company</h3>
+    <p>{{ contact.company_name }}</p>
+  </div>
+  <div>
+    <h3>Role</h3>
+    <p>{{ contact.job_title or "—" }}</p>
+  </div>
+  <div>
+    <h3>Email</h3>
+    <p>{{ contact.email or "—" }}</p>
+  </div>
+  <div>
+    <h3>Phone</h3>
+    <p>{{ contact.phone or "—" }}</p>
+  </div>
+  <div>
+    <h3>Created</h3>
+    <p>{{ contact.created_at }}</p>
+  </div>
+  <div class="detail-notes">
+    <h3>Notes</h3>
+    <p>{{ contact.notes or "No notes available." }}</p>
+  </div>
+</section>
+{% endblock %}

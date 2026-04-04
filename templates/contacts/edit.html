@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Contact | Job Application Tracker{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div>
+        <h2>Edit Contact</h2>
+        <p>Update the selected contact record.</p>
+    </div>
+    <a class="button-link button-secondary" href="{{ url_for('contacts_detail', contact_id=contact.contact_id) }}">Back to Detail</a>
+</section>
+
+<section class="card">
+    {% if error_message %}
+        <div class="alert-error">{{ error_message }}</div>
+    {% endif %}
+
+    <form method="POST" class="form-grid">
+        <label>
+            Company
+            <select name="company_id" required>
+                <option value="">Select a company</option>
+                {% for company in company_options %}
+                    <option value="{{ company.company_id }}" {% if company.company_id == contact.company_id %}selected{% endif %}>
+                        {{ company.company_name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </label>
+
+        <label>
+            First Name
+            <input type="text" name="first_name" value="{{ contact.first_name }}" required>
+        </label>
+
+        <label>
+            Last Name
+            <input type="text" name="last_name" value="{{ contact.last_name }}" required>
+        </label>
+
+        <label>
+            Email
+            <input type="email" name="email" value="{{ contact.email or '' }}">
+        </label>
+
+        <label>
+            Phone
+            <input type="text" name="phone" value="{{ contact.phone or '' }}">
+        </label>
+
+        <label>
+            Job Title
+            <input type="text" name="job_title" value="{{ contact.job_title or '' }}">
+        </label>
+
+        <label class="full-width">
+            Notes
+            <textarea name="notes" rows="5">{{ contact.notes or '' }}</textarea>
+        </label>
+
+        <div class="full-width form-actions">
+            <button type="submit">Save Changes</button>
+        </div>
+    </form>
+</section>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends "base.html" %} {% block title %}Create Contact | Job Application
+Tracker{% endblock %} {% block content %}
+<section class="page-header">
+  <div>
+    <h2>Create Contact</h2>
+    <p>Add a new contact record to the tracker.</p>
+  </div>
+  <a class="button-link button-secondary" href="{{ url_for('contacts_list') }}"
+    >Back to Contacts</a
+  >
+</section>
+
+<section class="card">
+  {% if error_message %}
+  <div class="alert-error">{{ error_message }}</div>
+  {% endif %}
+
+  <form method="POST" class="form-grid">
+    <label>
+      Company
+      <select name="company_id" required>
+        <option value="">Select a company</option>
+        {% for company in company_options %}
+        <option value="{{ company.company_id }}">
+          {{ company.company_name }}
+        </option>
+        {% endfor %}
+      </select>
+    </label>
+
+    <label>
+      First Name
+      <input type="text" name="first_name" required />
+    </label>
+
+    <label>
+      Last Name
+      <input type="text" name="last_name" required />
+    </label>
+
+    <label>
+      Email
+      <input type="email" name="email" />
+    </label>
+
+    <label>
+      Phone
+      <input type="text" name="phone" />
+    </label>
+
+    <label>
+      Job Title
+      <input type="text" name="job_title" />
+    </label>
+
+    <label class="full-width">
+      Notes
+      <textarea name="notes" rows="5"></textarea>
+    </label>
+
+    <div class="full-width form-actions">
+      <button type="submit">Create Contact</button>
+    </div>
+  </form>
+</section>
+{% endblock %}

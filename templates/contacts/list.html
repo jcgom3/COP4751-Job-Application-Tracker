@@ -1,0 +1,58 @@
+{% extends "base.html" %} {% block title %}Contacts | Job Application Tracker{%
+endblock %} {% block content %}
+<section class="page-header">
+  <div>
+    <h2>Contacts</h2>
+    <p>Track recruiters, hiring managers, and other company contacts.</p>
+  </div>
+  <a class="button-link" href="{{ url_for('contacts_create') }}">Add Contact</a>
+</section>
+
+<section class="card">
+  {% if contacts %}
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Company</th>
+        <th>Role</th>
+        <th>Email</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for contact in contacts %}
+      <tr>
+        <td>{{ contact.first_name }} {{ contact.last_name }}</td>
+        <td>{{ contact.company_name }}</td>
+        <td>{{ contact.job_title or "—" }}</td>
+        <td>{{ contact.email or "—" }}</td>
+        <td class="actions-cell">
+          <a
+            href="{{ url_for('contacts_detail', contact_id=contact.contact_id) }}"
+            >View</a
+          >
+          <a
+            href="{{ url_for('contacts_edit', contact_id=contact.contact_id) }}"
+            >Edit</a
+          >
+          <form
+            method="POST"
+            action="{{ url_for('contacts_delete', contact_id=contact.contact_id) }}"
+            class="inline-form"
+          >
+            <button type="submit" class="button-danger">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>No contacts found yet.</p>
+  <a class="button-link" href="{{ url_for('contacts_create') }}"
+    >Add First Contact</a
+  >
+  {% endif %}
+</section>
+{% endblock %}
