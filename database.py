@@ -740,3 +740,216 @@ def delete_application(application_id: int) -> None:
             cursor.close()
         if connection is not None and connection.is_connected():
             connection.close()
+            
+            
+def fetch_all_contacts() -> List[Dict[str, Any]]:
+    """
+    Return all contacts with company context.
+
+    Joining contacts to companies makes the list page much easier to scan and
+    avoids additional lookups at the route or template level.
+    """
+    connection = None
+    cursor = None
+
+    try:
+        connection = get_connection()
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute(
+            """
+            SELECT
+                ct.contact_id,
+                ct.company_id,
+                ct.first_name,
+                ct.last_name,
+                ct.email,
+                ct.phone,
+                ct.job_title,
+                ct.notes,
+                ct.created_at,
+                c.company_name
+            FROM contacts ct
+            INNER JOIN companies c
+                ON ct.company_id = c.company_id
+            ORDER BY c.company_name ASC, ct.last_name ASC, ct.first_name ASC
+            """
+        )
+        return cursor.fetchall()
+    finally:
+        if cursor is not None:
+            cursor.close()
+        if connection is not None and connection.is_connected():
+            connection.close()
+
+
+def fetch_contact_by_id(contact_id: int) -> Optional[Dict[str, Any]]:
+    """
+    Return a single contact with company context.
+    """
+    connection = None
+    cursor = None
+
+    try:
+        connection = get_connection()
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute(
+            """
+            SELECT
+                ct.contact_id,
+                ct.company_id,
+                ct.first_name,
+                ct.last_name,
+                ct.email,
+                ct.phone,
+                ct.job_title,
+                ct.notes,
+                ct.created_at,
+                c.company_name
+            FROM contacts ct
+            INNER JOIN companies c
+                ON ct.company_id = c.company_id
+            WHERE ct.contact_id = %s
+            """,
+            (contact_id,),
+        )
+        return cursor.fetchone()
+    finally:
+        if cursor is not None:
+            cursor.close()
+        if connection is not None and connection.is_connected():
+            connection.close()
+
+
+def create_contact(
+    company_id: int,
+    first_name: str,
+    last_name: str,
+    email: str,
+    phone: str,
+    job_title: str,
+    notes: str,
+) -> int:
+    """
+    Insert a new contact and return its ID.
+    """
+    connection = None
+    cursor = None
+
+    try:
+        connection = get_connection()
+        cursor = connection.cursor()
+        cursor.execute(
+            """
+            INSERT INTO contacts (
+                company_id,
+                first_name,
+                last_name,
+                email,
+                phone,
+                job_title,
+                notes
+            )
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """,
+            (
+                company_id,
+                first_name,
+                last_name,
+                email,
+                phone,
+                job_title,
+                notes,
+            ),
+        )
+        connection.commit()
+        return cursor.lastrowid
+    except Exception:
+        if connection is not None:
+            connection.rollback()
+        raise
+    finally:
+        if cursor is not None:
+            cursor.close()
+        if connection is not None and connection.is_connected():
+            connection.close()
+
+
+def update_contact(
+    contact_id: int,
+    company_id: int,
+    first_name: str,
+    last_name: str,
+    email: str,
+    phone: str,
+    job_title: str,
+    notes: str,
+) -> None:
+    """
+    Update an existing contact.
+    """
+    connection = None
+    cursor = None
+
+    try:
+        connection = get_connection()
+        cursor = connection.cursor()
+        cursor.execute(
+            """
+            UPDATE contacts
+            SET
+                company_id = %s,
+                first_name = %s,
+                last_name = %s,
+                email = %s,
+                phone = %s,
+                job_title = %s,
+                notes = %s
+            WHERE contact_id = %s
+            """,
+            (
+                company_id,
+                first_name,
+                last_name,
+                email,
+                phone,
+                job_title,
+                notes,
+                contact_id,
+            ),
+        )
+        connection.commit()
+    except Exception:
+        if connection is not None:
+            connection.rollback()
+        raise
+    finally:
+        if cursor is not None:
+            cursor.close()
+        if connection is not None and connection.is_connected():
+            connection.close()
+
+
+def delete_contact(contact_id: int) -> None:
+    """
+    Delete a contact by ID.
+    """
+    connection = None
+    cursor = None
+
+    try:
+        connection = get_connection()
+        cursor = connection.cursor()
+        cursor.execute(
+            "DELETE FROM contacts WHERE contact_id = %s",
+            (contact_id,),
+        )
+        connection.commit()
+    except Exception:
+        if connection is not None:
+            connection.rollback()
+        raise
+    finally:
+        if cursor is not None:
+            cursor.close()
+        if connection is not None and connection.is_connected():
+            connection.close()
