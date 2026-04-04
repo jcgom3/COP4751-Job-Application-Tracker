@@ -15,6 +15,11 @@ from database import (
     normalize_skills_input,
     update_company,
     update_job,
+    create_contact,
+    delete_contact,
+    fetch_all_contacts,
+    fetch_contact_by_id,
+    update_contact,
 )
 
 app = Flask(__name__)
@@ -292,3 +297,118 @@ def jobs_delete(job_id: int):
     """
     delete_job(job_id)
     return redirect(url_for("jobs_list"))
+
+
+
+
+@app.route("/contacts")
+def contacts_list():
+    """
+    Show all contacts.
+    """
+    contacts = fetch_all_contacts()
+    return render_template("contacts/list.html", contacts=contacts)
+
+
+@app.route("/contacts/<int:contact_id>")
+def contacts_detail(contact_id: int):
+    """
+    Show a single contact detail page.
+    """
+    contact = fetch_contact_by_id(contact_id)
+
+    if contact is None:
+        return render_template("404.html"), 404
+
+    return render_template("contacts/detail.html", contact=contact)
+
+
+@app.route("/contacts/create", methods=["GET", "POST"])
+def contacts_create():
+    """
+    Render the create form and handle contact creation.
+    """
+    company_options = fetch_company_options()
+    error_message = None
+
+    if request.method == "POST":
+        company_id_raw = request.form.get("company_id", "").strip()
+        first_name = request.form.get("first_name", "").strip()
+        last_name = request.form.get("last_name", "").strip()
+        email = request.form.get("email", "").strip()
+        phone = request.form.get("phone", "").strip()
+        job_title = request.form.get("job_title", "").strip()
+        notes = request.form.get("notes", "").strip()
+
+        if not company_id_raw or not first_name or not last_name:
+            error_message = "Company, first name, and last name are required."
+        else:
+            new_contact_id = create_contact(
+                company_id=int(company_id_raw),
+                first_name=first_name,
+                last_name=last_name,
+                email=email,
+                phone=phone,
+                job_title=job_title,
+                notes=notes,
+            )
+            return redirect(url_for("contacts_detail", contact_id=new_contact_id))
+
+    return render_template(
+        "contacts/create.html",
+        company_options=company_options,
+        error_message=error_message,
+    )
+
+
+@app.route("/contacts/<int:contact_id>/edit", methods=["GET", "POST"])
+def contacts_edit(contact_id: int):
+    """
+    Render the edit form and handle updates for an existing contact.
+    """
+    contact = fetch_contact_by_id(contact_id)
+    company_options = fetch_company_options()
+    error_message = None
+
+    if contact is None:
+        return render_template("404.html"), 404
+
+    if request.method == "POST":
+        company_id_raw = request.form.get("company_id", "").strip()
+        first_name = request.form.get("first_name", "").strip()
+        last_name = request.form.get("last_name", "").strip()
+        email = request.form.get("email", "").strip()
+        phone = request.form.get("phone", "").strip()
+        job_title = request.form.get("job_title", "").strip()
+        notes = request.form.get("notes", "").strip()
+
+        if not company_id_raw or not first_name or not last_name:
+            error_message = "Company, first name, and last name are required."
+        else:
+            update_contact(
+                contact_id=contact_id,
+                company_id=int(company_id_raw),
+                first_name=first_name,
+                last_name=last_name,
+                email=email,
+                phone=phone,
+                job_title=job_title,
+                notes=notes,
+            )
+            return redirect(url_for("contacts_detail", contact_id=contact_id))
+
+    return render_template(
+        "contacts/edit.html",
+        contact=contact,
+        company_options=company_options,
+        error_message=error_message,
+    )
+
+
+@app.route("/contacts/<int:contact_id>/delete", methods=["POST"])
+def contacts_delete(contact_id: int):
+    """
+    Delete a contact and return to the list page.
+    """
+    delete_contact(contact_id)
+    return redirect(url_for("contacts_list"))
